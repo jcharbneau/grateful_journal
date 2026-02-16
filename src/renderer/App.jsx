@@ -776,7 +776,17 @@ export default function App() {
                 He is based in the Cincinnati metropolitan area.
               </p>
               <p className="about-links">
-                jessecharbneau.com · LinkedIn: in/jcharbneau · GitHub: jcharbneau
+                <a href="https://www.jessecharbneau.com" target="_blank" rel="noreferrer">
+                  jessecharbneau.com
+                </a>
+                <span>·</span>
+                <a href="https://www.linkedin.com/in/jcharbneau" target="_blank" rel="noreferrer">
+                  LinkedIn: in/jcharbneau
+                </a>
+                <span>·</span>
+                <a href="https://github.com/jcharbneau" target="_blank" rel="noreferrer">
+                  GitHub: jcharbneau
+                </a>
               </p>
             </div>
 
