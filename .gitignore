@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+coverage
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal

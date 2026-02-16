@@ -1,0 +1,27 @@
+{
+  "name": "grateful-journal",
+  "version": "0.1.0",
+  "description": "Local gratitude journaling app.",
+  "main": "electron/main.js",
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "dev": "vite --host",
+    "electron:dev": "concurrently -k \"vite --host\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build",
+    "electron:build": "vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.0.1",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "vite": "^5.4.1",
+    "wait-on": "^7.2.0"
+  }
+}
