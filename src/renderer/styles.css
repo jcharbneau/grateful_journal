@@ -431,6 +431,21 @@ body {
   overflow-y: auto;
 }
 
+.settings-panel {
+  background: #fffaf2;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 28px;
+  max-width: 640px;
+  width: 100%;
+  box-shadow: 0 30px 60px rgba(31, 26, 18, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: min(78vh, 760px);
+  overflow-y: auto;
+}
+
 .about-header {
   display: flex;
   align-items: center;
@@ -486,6 +501,39 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-soft);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.settings-field input,
+.settings-field select {
+  border: 1px solid var(--line);
+  background: #fffaf2;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .drawer-header {
@@ -677,6 +725,10 @@ body {
   .toolbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
   }
 
   .page-nav.left,

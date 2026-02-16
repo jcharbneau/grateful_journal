@@ -144,6 +144,18 @@ app.whenReady().then(() => {
     return { error: result || null };
   });
 
+  ipcMain.handle("journal:get-settings", () => {
+    return db.getSettings();
+  });
+
+  ipcMain.handle("journal:update-settings", (_event, settings) => {
+    return db.updateSettings(settings);
+  });
+
+  ipcMain.handle("journal:update-last-opened", (_event, date) => {
+    return db.updateLastOpenedDate(date);
+  });
+
   const pdfMoods = [
     "Happy",
     "Content",

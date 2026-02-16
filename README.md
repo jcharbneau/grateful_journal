@@ -34,6 +34,7 @@ Right page (Evening Reflection):
 - Backup and restore of the local database.
 - Page navigation triangles and subtle page flip animation.
 - About dialog with story, motivation, and credits.
+- Settings for name, time zone, and default date view.
 
 ## Data Storage (Local Only)
 

@@ -39,6 +39,16 @@ const openDb = () => {
       updated_at TEXT
     );
   `);
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      name TEXT,
+      timezone TEXT,
+      default_date_view TEXT,
+      last_opened_date TEXT,
+      updated_at TEXT
+    );
+  `);
   return db;
 };
 
@@ -143,6 +153,69 @@ const getAllEntries = () => {
   }));
 };
 
+const getSettings = () => {
+  const row = db.prepare("SELECT * FROM settings WHERE id = 1").get();
+  const defaults = {
+    name: "",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+    default_date_view: "today",
+    last_opened_date: null
+  };
+
+  if (!row) {
+    const now = new Date().toISOString();
+    db.prepare(
+      "INSERT INTO settings (id, name, timezone, default_date_view, last_opened_date, updated_at) VALUES (1, @name, @timezone, @default_date_view, @last_opened_date, @updated_at)"
+    ).run({
+      ...defaults,
+      updated_at: now
+    });
+    return defaults;
+  }
+
+  return {
+    name: row.name || "",
+    timezone: row.timezone || defaults.timezone,
+    default_date_view: row.default_date_view || "today",
+    last_opened_date: row.last_opened_date || null
+  };
+};
+
+const updateSettings = (settings) => {
+  const current = getSettings();
+  const merged = {
+    ...current,
+    ...settings
+  };
+  const now = new Date().toISOString();
+
+  db.prepare(
+    `
+      INSERT INTO settings (id, name, timezone, default_date_view, last_opened_date, updated_at)
+      VALUES (1, @name, @timezone, @default_date_view, @last_opened_date, @updated_at)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        timezone = excluded.timezone,
+        default_date_view = excluded.default_date_view,
+        last_opened_date = excluded.last_opened_date,
+        updated_at = excluded.updated_at
+    `
+  ).run({
+    ...merged,
+    updated_at: now
+  });
+
+  return getSettings();
+};
+
+const updateLastOpenedDate = (date) => {
+  const current = getSettings();
+  return updateSettings({
+    ...current,
+    last_opened_date: date
+  });
+};
+
 module.exports = {
   getDataDir: () => dataDir,
   getDbPath: () => dbPath,
@@ -159,5 +232,8 @@ module.exports = {
     ensureDataDir();
     fs.copyFileSync(filePath, dbPath);
     db = openDb();
-  }
+  },
+  getSettings,
+  updateSettings,
+  updateLastOpenedDate
 };

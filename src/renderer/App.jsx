@@ -42,6 +42,14 @@ const monthNames = [
   "December"
 ];
 
+const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+const timeZoneOptions = (() => {
+  if (typeof Intl.supportedValuesOf === "function") {
+    return Intl.supportedValuesOf("timeZone");
+  }
+  return [systemTimeZone, "UTC"];
+})();
+
 const Prompt = ({ title, rows = 3, value, onChange }) => (
   <div className="prompt-block">
     <div className="prompt-title">{title}</div>
@@ -73,6 +81,9 @@ export default function App() {
   const [backupStatus, setBackupStatus] = useState("Idle");
   const [dataDir, setDataDir] = useState("");
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settings, setSettings] = useState(null);
+  const [settingsStatus, setSettingsStatus] = useState("Idle");
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -105,6 +116,16 @@ export default function App() {
 
   useEffect(() => {
     window.journal.getDataDir().then((dir) => setDataDir(dir));
+  }, []);
+
+  useEffect(() => {
+    window.journal.getSettings().then((data) => {
+      setSettings(data);
+      if (data.default_date_view === "last_opened" && data.last_opened_date) {
+        dateRef.current = data.last_opened_date;
+        setDate(data.last_opened_date);
+      }
+    });
   }, []);
 
   const updateField = (field) => (event) => {
@@ -290,6 +311,10 @@ export default function App() {
     };
   }, [entry, dirty]);
 
+  useEffect(() => {
+    window.journal.updateLastOpened(date);
+  }, [date]);
+
   if (!entry) return <div className="page">Loading...</div>;
 
   return (
@@ -323,6 +348,9 @@ export default function App() {
           </button>
           <button className="ghost-button" type="button" onClick={() => setAboutOpen(true)}>
             About
+          </button>
+          <button className="ghost-button" type="button" onClick={() => setSettingsOpen(true)}>
+            Settings
           </button>
         </div>
         <div className="export-group">
@@ -657,6 +685,80 @@ export default function App() {
                 add autosave, calendar browsing, export, page navigation, and an intentional, paper-like
                 layout.
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {settingsOpen && settings && (
+        <div className="about-overlay" onClick={() => setSettingsOpen(false)}>
+          <div className="settings-panel" onClick={(event) => event.stopPropagation()}>
+            <div className="about-header">
+              <div>
+                <div className="about-title">Settings</div>
+                <div className="about-subtitle">Personalize your journal</div>
+              </div>
+              <button className="ghost-button" type="button" onClick={() => setSettingsOpen(false)}>
+                Close
+              </button>
+            </div>
+
+            <div className="settings-grid">
+              <label className="settings-field">
+                <span>Display Name</span>
+                <input
+                  type="text"
+                  value={settings.name}
+                  onChange={(event) => setSettings({ ...settings, name: event.target.value })}
+                />
+              </label>
+
+              <label className="settings-field">
+                <span>Time Zone</span>
+                <select
+                  value={settings.timezone}
+                  onChange={(event) => setSettings({ ...settings, timezone: event.target.value })}
+                >
+                  {timeZoneOptions.map((zone) => (
+                    <option key={zone} value={zone}>
+                      {zone}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="settings-field">
+                <span>Default Date View</span>
+                <select
+                  value={settings.default_date_view}
+                  onChange={(event) =>
+                    setSettings({ ...settings, default_date_view: event.target.value })
+                  }
+                >
+                  <option value="today">Today</option>
+                  <option value="last_opened">Last Opened</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="settings-actions">
+              <button
+                className="save-button"
+                type="button"
+                onClick={async () => {
+                  setSettingsStatus("Saving");
+                  const saved = await window.journal.updateSettings(settings);
+                  setSettings(saved);
+                  setSettingsStatus("Saved");
+                  setTimeout(() => setSettingsStatus("Idle"), 1200);
+                }}
+              >
+                {settingsStatus === "Saving"
+                  ? "Saving..."
+                  : settingsStatus === "Saved"
+                  ? "Saved"
+                  : "Save Settings"}
+              </button>
             </div>
           </div>
         </div>
