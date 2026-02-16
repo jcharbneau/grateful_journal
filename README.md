@@ -29,12 +29,13 @@ Right page (Evening Reflection):
 - Local SQLite storage with autosave per date.
 - Browse entries drawer with calendar (month/year picker + week numbers) and recent list.
 - JSON, CSV, and PDF export via save dialog.
+- Backup and restore of the local database.
 - Page navigation triangles and subtle page flip animation.
 
 ## Data Storage (Local Only)
 
 - Implemented: SQLite via `better-sqlite3`.
-- Stored in Electron's `app.getPath("userData")` as `journal.sqlite`.
+- Stored in `~/.grateful-journal/journal.sqlite`.
 - This file lives in each user's OS home data directory and is never committed.
 
 ## Native Module Prereqs (better-sqlite3)

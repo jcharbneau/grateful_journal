@@ -69,6 +69,7 @@ export default function App() {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [monthDates, setMonthDates] = useState([]);
   const [exportStatus, setExportStatus] = useState("Idle");
+  const [backupStatus, setBackupStatus] = useState("Idle");
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -179,6 +180,34 @@ export default function App() {
       setTimeout(() => setExportStatus("Idle"), 1500);
     } else {
       setExportStatus("Idle");
+    }
+  };
+
+  const handleBackup = async () => {
+    setBackupStatus("Backing up");
+    const result = await window.journal.backupDatabase();
+    if (result && !result.canceled) {
+      setBackupStatus("Backup saved");
+      setTimeout(() => setBackupStatus("Idle"), 1500);
+    } else {
+      setBackupStatus("Idle");
+    }
+  };
+
+  const handleRestore = async () => {
+    setBackupStatus("Restoring");
+    const result = await window.journal.restoreDatabase();
+    if (result && !result.canceled) {
+      const refreshed = await window.journal.getEntry(date);
+      setEntry(refreshed);
+      if (drawerOpen) {
+        window.journal.listEntries(60).then((rows) => setEntryList(rows));
+        window.journal.listEntryDates(month).then((dates) => setMonthDates(dates));
+      }
+      setBackupStatus("Restored");
+      setTimeout(() => setBackupStatus("Idle"), 1500);
+    } else {
+      setBackupStatus("Idle");
     }
   };
 
@@ -522,6 +551,29 @@ export default function App() {
               </button>
             ))
           )}
+        </div>
+
+        <div className="backup-panel">
+          <div className="backup-title">Backup & Restore</div>
+          <div className="backup-actions">
+            <button className="ghost-button" type="button" onClick={handleBackup}>
+              Backup
+            </button>
+            <button className="ghost-button" type="button" onClick={handleRestore}>
+              Restore
+            </button>
+            <span className="backup-status">
+              {backupStatus === "Backing up"
+                ? "Saving..."
+                : backupStatus === "Backup saved"
+                ? "Backup saved"
+                : backupStatus === "Restoring"
+                ? "Restoring..."
+                : backupStatus === "Restored"
+                ? "Restored"
+                : ""}
+            </span>
+          </div>
         </div>
 
       </div>

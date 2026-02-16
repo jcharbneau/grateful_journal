@@ -142,6 +142,33 @@ body {
   color: var(--ink-soft);
 }
 
+.backup-panel {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.backup-title {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.backup-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.backup-status {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
 
 .spread {
   display: grid;

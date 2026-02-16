@@ -110,6 +110,30 @@ app.whenReady().then(() => {
     return { canceled: false, filePath };
   });
 
+  ipcMain.handle("journal:backup-db", async () => {
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: "Backup Journal Database",
+      defaultPath: "grateful-journal-backup.sqlite",
+      filters: [{ name: "SQLite", extensions: ["sqlite"] }]
+    });
+
+    if (canceled || !filePath) return { canceled: true };
+    await db.backupDatabase(filePath);
+    return { canceled: false, filePath };
+  });
+
+  ipcMain.handle("journal:restore-db", async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: "Restore Journal Database",
+      filters: [{ name: "SQLite", extensions: ["sqlite", "db"] }],
+      properties: ["openFile"]
+    });
+
+    if (canceled || !filePaths || filePaths.length === 0) return { canceled: true };
+    db.restoreDatabase(filePaths[0]);
+    return { canceled: false, filePath: filePaths[0] };
+  });
+
   const pdfMoods = [
     "Happy",
     "Content",

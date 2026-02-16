@@ -11,5 +11,7 @@ contextBridge.exposeInMainWorld("journal", {
   listEntries: (limit) => ipcRenderer.invoke("journal:list-entries", limit),
   listEntryDates: (yearMonth) => ipcRenderer.invoke("journal:list-entry-dates", yearMonth),
   exportEntries: (format) => ipcRenderer.invoke("journal:export-entries", format),
+  backupDatabase: () => ipcRenderer.invoke("journal:backup-db"),
+  restoreDatabase: () => ipcRenderer.invoke("journal:restore-db"),
   exportEntryPdf: (entry) => ipcRenderer.invoke("journal:export-entry-pdf", entry)
 });

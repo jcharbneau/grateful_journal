@@ -1,28 +1,48 @@
 const path = require("path");
+const fs = require("fs");
 const Database = require("better-sqlite3");
 const { app } = require("electron");
 
-const dbPath = path.join(app.getPath("userData"), "journal.sqlite");
-const db = new Database(dbPath);
+const dataDir = path.join(app.getPath("home"), ".grateful-journal");
+const dbPath = path.join(dataDir, "journal.sqlite");
+const legacyPath = path.join(app.getPath("userData"), "journal.sqlite");
 
-db.pragma("journal_mode = WAL");
+const ensureDataDir = () => {
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+};
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS entries (
-    date TEXT PRIMARY KEY,
-    focus TEXT,
-    affirmation TEXT,
-    grateful TEXT,
-    excited TEXT,
-    space TEXT,
-    good_things TEXT,
-    positive_difference TEXT,
-    felt_moods TEXT,
-    notes TEXT,
-    sleep_thought TEXT,
-    updated_at TEXT
-  );
-`);
+const migrateLegacyDb = () => {
+  if (fs.existsSync(dbPath)) return;
+  if (!fs.existsSync(legacyPath)) return;
+  ensureDataDir();
+  fs.renameSync(legacyPath, dbPath);
+};
+
+const openDb = () => {
+  ensureDataDir();
+  migrateLegacyDb();
+  const db = new Database(dbPath);
+  db.pragma("journal_mode = WAL");
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS entries (
+      date TEXT PRIMARY KEY,
+      focus TEXT,
+      affirmation TEXT,
+      grateful TEXT,
+      excited TEXT,
+      space TEXT,
+      good_things TEXT,
+      positive_difference TEXT,
+      felt_moods TEXT,
+      notes TEXT,
+      sleep_thought TEXT,
+      updated_at TEXT
+    );
+  `);
+  return db;
+};
+
+let db = openDb();
 
 const emptyEntry = (date) => ({
   date,
@@ -124,9 +144,19 @@ const getAllEntries = () => {
 };
 
 module.exports = {
+  getDbPath: () => dbPath,
   getEntry,
   upsertEntry,
   listEntries,
   listEntryDates,
-  getAllEntries
+  getAllEntries,
+  backupDatabase: async (filePath) => {
+    await db.backup(filePath);
+  },
+  restoreDatabase: (filePath) => {
+    db.close();
+    ensureDataDir();
+    fs.copyFileSync(filePath, dbPath);
+    db = openDb();
+  }
 };
