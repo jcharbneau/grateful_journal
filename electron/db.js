@@ -144,6 +144,7 @@ const getAllEntries = () => {
 };
 
 module.exports = {
+  getDataDir: () => dataDir,
   getDbPath: () => dbPath,
   getEntry,
   upsertEntry,

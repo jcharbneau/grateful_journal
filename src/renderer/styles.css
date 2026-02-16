@@ -169,6 +169,27 @@ body {
   color: var(--ink-soft);
 }
 
+.data-location {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.data-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.data-path {
+  font-size: 12px;
+  color: var(--ink);
+  word-break: break-all;
+  grid-column: 1 / -1;
+}
+
 
 .spread {
   display: grid;

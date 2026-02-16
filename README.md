@@ -37,6 +37,7 @@ Right page (Evening Reflection):
 - Implemented: SQLite via `better-sqlite3`.
 - Stored in `~/.grateful-journal/journal.sqlite`.
 - This file lives in each user's OS home data directory and is never committed.
+- The app can open the data folder from the drawer.
 
 ## Native Module Prereqs (better-sqlite3)
 
@@ -67,3 +68,5 @@ npm run electron:dev
 ```bash
 npm run electron:build
 ```
+
+Build artifacts are written to `release/` via `electron-builder`.

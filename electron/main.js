@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
 
@@ -132,6 +132,16 @@ app.whenReady().then(() => {
     if (canceled || !filePaths || filePaths.length === 0) return { canceled: true };
     db.restoreDatabase(filePaths[0]);
     return { canceled: false, filePath: filePaths[0] };
+  });
+
+  ipcMain.handle("journal:get-data-dir", () => {
+    return db.getDataDir();
+  });
+
+  ipcMain.handle("journal:open-data-dir", async () => {
+    const dir = db.getDataDir();
+    const result = await shell.openPath(dir);
+    return { error: result || null };
   });
 
   const pdfMoods = [

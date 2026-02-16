@@ -13,5 +13,7 @@ contextBridge.exposeInMainWorld("journal", {
   exportEntries: (format) => ipcRenderer.invoke("journal:export-entries", format),
   backupDatabase: () => ipcRenderer.invoke("journal:backup-db"),
   restoreDatabase: () => ipcRenderer.invoke("journal:restore-db"),
-  exportEntryPdf: (entry) => ipcRenderer.invoke("journal:export-entry-pdf", entry)
+  exportEntryPdf: (entry) => ipcRenderer.invoke("journal:export-entry-pdf", entry),
+  getDataDir: () => ipcRenderer.invoke("journal:get-data-dir"),
+  openDataDir: () => ipcRenderer.invoke("journal:open-data-dir")
 });

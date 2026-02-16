@@ -70,6 +70,7 @@ export default function App() {
   const [monthDates, setMonthDates] = useState([]);
   const [exportStatus, setExportStatus] = useState("Idle");
   const [backupStatus, setBackupStatus] = useState("Idle");
+  const [dataDir, setDataDir] = useState("");
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -99,6 +100,10 @@ export default function App() {
     if (!drawerOpen) return;
     window.journal.listEntryDates(month).then((dates) => setMonthDates(dates));
   }, [drawerOpen, month]);
+
+  useEffect(() => {
+    window.journal.getDataDir().then((dir) => setDataDir(dir));
+  }, []);
 
   const updateField = (field) => (event) => {
     const value = event.target.value;
@@ -209,6 +214,10 @@ export default function App() {
     } else {
       setBackupStatus("Idle");
     }
+  };
+
+  const handleOpenDataDir = async () => {
+    await window.journal.openDataDir();
   };
 
 
@@ -573,6 +582,13 @@ export default function App() {
                 ? "Restored"
                 : ""}
             </span>
+          </div>
+          <div className="data-location">
+            <div className="data-label">Data Location</div>
+            <div className="data-path">{dataDir || ""}</div>
+            <button className="ghost-button" type="button" onClick={handleOpenDataDir}>
+              Open Folder
+            </button>
           </div>
         </div>
 
