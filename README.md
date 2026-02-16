@@ -28,7 +28,7 @@ Right page (Evening Reflection):
 
 - Local SQLite storage with autosave per date.
 - Browse entries drawer with calendar (month/year picker + week numbers) and recent list.
-- JSON and CSV export via save dialog.
+- JSON, CSV, and PDF export via save dialog.
 - Page navigation triangles and subtle page flip animation.
 
 ## Data Storage (Local Only)

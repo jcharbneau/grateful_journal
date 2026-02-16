@@ -10,5 +10,6 @@ contextBridge.exposeInMainWorld("journal", {
   upsertEntry: (entry) => ipcRenderer.invoke("journal:upsert-entry", entry),
   listEntries: (limit) => ipcRenderer.invoke("journal:list-entries", limit),
   listEntryDates: (yearMonth) => ipcRenderer.invoke("journal:list-entry-dates", yearMonth),
-  exportEntries: (format) => ipcRenderer.invoke("journal:export-entries", format)
+  exportEntries: (format) => ipcRenderer.invoke("journal:export-entries", format),
+  exportEntryPdf: (entry) => ipcRenderer.invoke("journal:export-entry-pdf", entry)
 });

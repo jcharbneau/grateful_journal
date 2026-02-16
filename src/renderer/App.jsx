@@ -170,6 +170,19 @@ export default function App() {
     }
   };
 
+  const handleExportPdf = async () => {
+    if (!entry) return;
+    setExportStatus("Exporting");
+    const result = await window.journal.exportEntryPdf(entry);
+    if (result && !result.canceled) {
+      setExportStatus("Exported");
+      setTimeout(() => setExportStatus("Idle"), 1500);
+    } else {
+      setExportStatus("Idle");
+    }
+  };
+
+
   const monthMeta = useMemo(() => {
     const [year, monthValue] = month.split("-").map(Number);
     const first = new Date(year, monthValue - 1, 1);
@@ -274,6 +287,9 @@ export default function App() {
           </button>
           <button className="ghost-button" type="button" onClick={() => handleExport("csv")}>
             CSV
+          </button>
+          <button className="ghost-button" type="button" onClick={handleExportPdf}>
+            PDF
           </button>
           <span className="export-status">
             {exportStatus === "Exporting"
@@ -507,6 +523,7 @@ export default function App() {
             ))
           )}
         </div>
+
       </div>
       <div className={`drawer-backdrop ${drawerOpen ? "show" : ""}`} onClick={() => setDrawerOpen(false)} />
     </div>
