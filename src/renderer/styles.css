@@ -7,7 +7,9 @@
   --ink-soft: rgba(47, 42, 37, 0.6);
   --line: rgba(47, 42, 37, 0.14);
   --accent: #b39c7b;
+  --accent-strong: #a38355;
   --shadow: rgba(31, 26, 18, 0.08);
+  --panel-glow: rgba(255, 255, 255, 0.5);
 }
 
 * {
@@ -18,8 +20,9 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, #fef9f1 0%, transparent 55%),
-    radial-gradient(circle at bottom right, #eadfcd 0%, transparent 60%),
+    radial-gradient(circle at top left, rgba(254, 249, 241, 0.9) 0%, transparent 55%),
+    radial-gradient(circle at bottom right, rgba(234, 223, 205, 0.85) 0%, transparent 60%),
+    linear-gradient(120deg, rgba(255, 250, 243, 0.7), rgba(244, 235, 220, 0.6)),
     var(--paper);
   font-family: "Work Sans", "Segoe UI", sans-serif;
 }
@@ -30,6 +33,30 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before,
+.page::after {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4), transparent 70%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.page::before {
+  top: -200px;
+  left: -160px;
+}
+
+.page::after {
+  bottom: -220px;
+  right: -160px;
 }
 
 .page-header {
@@ -91,7 +118,7 @@ body {
 }
 
 .save-button:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-strong);
 }
 
 .save-hint {
@@ -127,7 +154,7 @@ body {
 }
 
 .ghost-button:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-strong);
 }
 
 .export-group {
@@ -267,11 +294,11 @@ body {
 }
 
 .panel {
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.1));
-  border: 1px solid rgba(47, 42, 37, 0.18);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.18));
+  border: 1px solid rgba(47, 42, 37, 0.16);
   border-radius: 22px;
   padding: clamp(20px, 3vw, 32px);
-  box-shadow: 0 30px 60px var(--shadow);
+  box-shadow: 0 30px 60px var(--shadow), inset 0 1px 0 var(--panel-glow);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -280,7 +307,7 @@ body {
 .panel-title {
   font-family: "Cormorant Garamond", "Times New Roman", serif;
   font-size: clamp(22px, 2.6vw, 30px);
-  letter-spacing: 0.35em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--ink);
 }
@@ -295,7 +322,7 @@ body {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.35em;
-  color: var(--ink-soft);
+  color: rgba(47, 42, 37, 0.55);
 }
 
 .entry {
@@ -310,7 +337,7 @@ body {
 }
 
 .entry.lines {
-  background-image: linear-gradient(transparent 1.6rem, var(--line) 1.6rem);
+  background-image: linear-gradient(transparent 1.55rem, rgba(47, 42, 37, 0.12) 1.55rem);
   background-size: 100% 1.8rem;
   background-attachment: local;
 }
@@ -332,7 +359,7 @@ body {
   gap: 8px;
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   color: var(--ink);
 }
 
@@ -348,8 +375,8 @@ body {
 }
 
 .mood-item input:checked {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
 }
 
 .notes {
