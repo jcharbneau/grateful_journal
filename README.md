@@ -35,6 +35,7 @@ Right page (Evening Reflection):
 - Page navigation triangles and subtle page flip animation.
 - About dialog with story, motivation, and credits.
 - Settings for name, time zone, and default date view.
+- Optional daily reminder notifications while the app is open.
 
 ## Data Storage (Local Only)
 

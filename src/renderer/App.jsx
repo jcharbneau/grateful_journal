@@ -128,6 +128,39 @@ export default function App() {
     });
   }, []);
 
+  useEffect(() => {
+    if (!settings || !settings.reminder_enabled) return;
+    if (!("Notification" in window)) return;
+
+    const [hours, minutes] = settings.reminder_time.split(":").map(Number);
+    const scheduleNext = () => {
+      const now = new Date();
+      const next = new Date();
+      next.setHours(hours, minutes, 0, 0);
+      if (next <= now) next.setDate(next.getDate() + 1);
+      const delay = next.getTime() - now.getTime();
+      return window.setTimeout(() => {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        if (window.__lastReminderDate !== todayKey) {
+          window.__lastReminderDate = todayKey;
+          new Notification("Grateful Journal", {
+            body: "Take a moment for your journal today."
+          });
+        }
+        scheduleNext();
+      }, delay);
+    };
+
+    if (Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    let timeoutId = scheduleNext();
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, [settings]);
+
   const updateField = (field) => (event) => {
     const value = event.target.value;
     setEntry((prev) => ({ ...prev, [field]: value }));
@@ -738,6 +771,34 @@ export default function App() {
                   <option value="today">Today</option>
                   <option value="last_opened">Last Opened</option>
                 </select>
+              </label>
+
+              <label className="settings-field checkbox">
+                <span>Daily Reminder</span>
+                <input
+                  type="checkbox"
+                  checked={Boolean(settings.reminder_enabled)}
+                  onChange={(event) =>
+                    setSettings({
+                      ...settings,
+                      reminder_enabled: event.target.checked ? 1 : 0
+                    })
+                  }
+                />
+              </label>
+
+              <label className="settings-field">
+                <span>Reminder Time (Local)</span>
+                <input
+                  type="time"
+                  value={settings.reminder_time}
+                  onChange={(event) =>
+                    setSettings({
+                      ...settings,
+                      reminder_time: event.target.value
+                    })
+                  }
+                />
               </label>
             </div>
 

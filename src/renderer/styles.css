@@ -531,6 +531,18 @@ body {
   text-transform: none;
 }
 
+.settings-field.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-field.checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
 .settings-actions {
   display: flex;
   justify-content: flex-end;

@@ -45,6 +45,8 @@ const openDb = () => {
       name TEXT,
       timezone TEXT,
       default_date_view TEXT,
+      reminder_enabled INTEGER,
+      reminder_time TEXT,
       last_opened_date TEXT,
       updated_at TEXT
     );
@@ -159,6 +161,8 @@ const getSettings = () => {
     name: "",
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
     default_date_view: "today",
+    reminder_enabled: 0,
+    reminder_time: "20:30",
     last_opened_date: null
   };
 
@@ -177,6 +181,8 @@ const getSettings = () => {
     name: row.name || "",
     timezone: row.timezone || defaults.timezone,
     default_date_view: row.default_date_view || "today",
+    reminder_enabled: row.reminder_enabled ?? defaults.reminder_enabled,
+    reminder_time: row.reminder_time || defaults.reminder_time,
     last_opened_date: row.last_opened_date || null
   };
 };
