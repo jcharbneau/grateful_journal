@@ -84,6 +84,8 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState(null);
   const [settingsStatus, setSettingsStatus] = useState("Idle");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [moodFilter, setMoodFilter] = useState("");
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -106,7 +108,7 @@ export default function App() {
 
   useEffect(() => {
     if (!drawerOpen) return;
-    window.journal.listEntries(60).then((rows) => setEntryList(rows));
+    window.journal.listEntries(200).then((rows) => setEntryList(rows));
   }, [drawerOpen, date]);
 
   useEffect(() => {
@@ -330,6 +332,19 @@ export default function App() {
   }, [month, monthMeta.daysInMonth]);
 
   const entryDatesSet = useMemo(() => new Set(monthDates), [monthDates]);
+
+  const filteredEntries = useMemo(() => {
+    if (!searchQuery && !moodFilter) return entryList;
+    const query = searchQuery.trim().toLowerCase();
+    return entryList.filter((row) => {
+      const matchesMood = moodFilter
+        ? Array.isArray(row.felt_moods) && row.felt_moods.includes(moodFilter)
+        : true;
+      if (!query) return matchesMood;
+      const haystack = `${row.focus || ""} ${row.good_things || ""} ${row.notes || ""}`.toLowerCase();
+      return matchesMood && haystack.includes(query);
+    });
+  }, [entryList, searchQuery, moodFilter]);
 
   const summary = useMemo(() => {
     if (!entry) return { words: 0, moods: 0, updatedAt: null };
@@ -646,10 +661,26 @@ export default function App() {
         </div>
 
         <div className="entry-list">
-          {entryList.length === 0 ? (
+          <div className="entry-filters">
+            <input
+              type="text"
+              placeholder="Search entries"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+            <select value={moodFilter} onChange={(event) => setMoodFilter(event.target.value)}>
+              <option value="">All moods</option>
+              {moods.map((mood) => (
+                <option key={mood} value={mood}>
+                  {mood}
+                </option>
+              ))}
+            </select>
+          </div>
+          {filteredEntries.length === 0 ? (
             <div className="empty-state">No entries yet.</div>
           ) : (
-            entryList.map((row) => (
+            filteredEntries.map((row) => (
               <button
                 key={row.date}
                 className={`entry-card ${row.date === date ? "active" : ""}`}

@@ -136,9 +136,13 @@ const upsertEntry = (entry) => {
 const listEntries = (limit = 30) => {
   return db
     .prepare(
-      "SELECT date, focus, good_things, updated_at FROM entries ORDER BY date DESC LIMIT ?"
+      "SELECT date, focus, good_things, notes, felt_moods, updated_at FROM entries ORDER BY date DESC LIMIT ?"
     )
-    .all(limit);
+    .all(limit)
+    .map((row) => ({
+      ...row,
+      felt_moods: row.felt_moods ? JSON.parse(row.felt_moods) : []
+    }));
 };
 
 const listEntryDates = (yearMonth) => {

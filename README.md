@@ -38,6 +38,7 @@ Right page (Evening Reflection):
 - Optional daily reminder notifications while the app is open.
 - Refined paper-like theme with warmer tones and subtle texture.
 - Minimal daily summary (word count, moods, last saved).
+- Entry search and mood filter in the browse drawer.
 
 ## Data Storage (Local Only)
 

@@ -733,6 +733,23 @@ body {
   padding-right: 4px;
 }
 
+.entry-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.entry-filters input,
+.entry-filters select {
+  border: 1px solid var(--line);
+  background: #fffaf2;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--ink);
+}
+
 .entry-card {
   border: 1px solid var(--line);
   background: #fffaf2;
