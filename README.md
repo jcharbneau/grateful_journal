@@ -37,6 +37,7 @@ Right page (Evening Reflection):
 - Settings for name, time zone, and default date view.
 - Optional daily reminder notifications while the app is open.
 - Refined paper-like theme with warmer tones and subtle texture.
+- Minimal daily summary (word count, moods, last saved).
 
 ## Data Storage (Local Only)
 

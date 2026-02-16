@@ -331,6 +331,38 @@ export default function App() {
 
   const entryDatesSet = useMemo(() => new Set(monthDates), [monthDates]);
 
+  const summary = useMemo(() => {
+    if (!entry) return { words: 0, moods: 0, updatedAt: null };
+    const fields = [
+      entry.focus,
+      entry.affirmation,
+      entry.grateful,
+      entry.excited,
+      entry.space,
+      entry.good_things,
+      entry.positive_difference,
+      entry.notes,
+      entry.sleep_thought
+    ];
+    const words = fields
+      .join(" ")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    return {
+      words,
+      moods: (entry.felt_moods || []).length,
+      updatedAt: entry.updated_at || null
+    };
+  }, [entry]);
+
+  const lastSavedLabel = useMemo(() => {
+    if (!summary.updatedAt) return "Not saved yet";
+    const savedDate = new Date(summary.updatedAt);
+    if (Number.isNaN(savedDate.getTime())) return "Not saved yet";
+    return savedDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }, [summary.updatedAt]);
+
   useEffect(() => {
     if (!entry || suppressSave.current || !dirty) return;
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
@@ -405,6 +437,12 @@ export default function App() {
               : ""}
           </span>
         </div>
+      </div>
+
+      <div className="summary-bar">
+        <span>Today: {summary.words} words</span>
+        <span>{summary.moods} moods</span>
+        <span>Last saved: {lastSavedLabel}</span>
       </div>
 
       <div className="spread-frame">
