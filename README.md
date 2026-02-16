@@ -2,6 +2,8 @@
 
 Local-first gratitude journaling app inspired by a two-page book spread. Runs on macOS and Windows 11 using Electron.
 
+![Book spread inspiration](assets/journal-spread.jpg)
+
 ## Product Idea
 
 - Emulate the physical journal experience: two-page spread, ruled lines, focused prompts.
@@ -31,6 +33,7 @@ Right page (Evening Reflection):
 - JSON, CSV, and PDF export via save dialog.
 - Backup and restore of the local database.
 - Page navigation triangles and subtle page flip animation.
+- About dialog with story, motivation, and credits.
 
 ## Data Storage (Local Only)
 
@@ -55,6 +58,7 @@ These are only needed for building native deps locally. CI or packaged builds wi
 - Persist entries per date and autosave.
 - Add navigation triangles, page flip animation, and align Save to the date field.
 - Add calendar/list browsing and export.
+- Add a simple About page with the project story.
 
 ## Run (Development)
 

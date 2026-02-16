@@ -71,6 +71,7 @@ export default function App() {
   const [exportStatus, setExportStatus] = useState("Idle");
   const [backupStatus, setBackupStatus] = useState("Idle");
   const [dataDir, setDataDir] = useState("");
+  const [aboutOpen, setAboutOpen] = useState(false);
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -315,9 +316,14 @@ export default function App() {
       </header>
 
       <div className="toolbar">
-        <button className="ghost-button" type="button" onClick={() => setDrawerOpen(true)}>
-          Browse Entries
-        </button>
+        <div className="toolbar-left">
+          <button className="ghost-button" type="button" onClick={() => setDrawerOpen(true)}>
+            Browse Entries
+          </button>
+          <button className="ghost-button" type="button" onClick={() => setAboutOpen(true)}>
+            About
+          </button>
+        </div>
         <div className="export-group">
           <span className="export-label">Export</span>
           <button className="ghost-button" type="button" onClick={() => handleExport("json")}>
@@ -594,6 +600,62 @@ export default function App() {
 
       </div>
       <div className={`drawer-backdrop ${drawerOpen ? "show" : ""}`} onClick={() => setDrawerOpen(false)} />
+
+      {aboutOpen && (
+        <div className="about-overlay" onClick={() => setAboutOpen(false)}>
+          <div className="about-panel" onClick={(event) => event.stopPropagation()}>
+            <div className="about-header">
+              <div>
+                <div className="about-title">About Grateful Journal</div>
+                <div className="about-subtitle">It all started with a image...</div>
+              </div>
+              <button className="ghost-button" type="button" onClick={() => setAboutOpen(false)}>
+                Close
+              </button>
+            </div>
+
+            <div className="about-section">
+              <div className="about-section-title">The Tool</div>
+              <p>
+                Grateful Journal is a local-first, two-page daily ritual inspired by a physical notebook
+                spread. It keeps your entries private on your machine and makes journaling feel calm and
+                tactile without sacrificing search, export, or backup.
+              </p>
+            </div>
+
+            <div className="about-section">
+              <div className="about-section-title">Motivation</div>
+              <p>
+                The goal is to preserve the intention of handwritten journaling while giving you modern
+                conveniences: daily prompts, autosave, and easy exports. It is designed to feel like paper,
+                not software.
+              </p>
+            </div>
+
+            <div className="about-section">
+              <div className="about-section-title">About Jesse Charbneau</div>
+              <p>
+                Jesse is an engineering leader focused on data, web, and platform development with more
+                than 25 years of experience. Highlights include modernizing Glassdoor's data infrastructure
+                to handle 300B+ annual events and building Ubisoft's global marketing analytics platform.
+                He is based in the Cincinnati metropolitan area.
+              </p>
+              <p className="about-links">
+                jessecharbneau.com · LinkedIn: in/jcharbneau · GitHub: jcharbneau
+              </p>
+            </div>
+
+            <div className="about-section">
+              <div className="about-section-title">Prompts Summary</div>
+              <p>
+                Build a local Mac/Windows journal that mirrors the book spread, persist entries by date,
+                add autosave, calendar browsing, export, page navigation, and an intentional, paper-like
+                layout.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
