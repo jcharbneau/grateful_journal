@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import journalImage from "../assets/journal-spread.jpg";
 
 const moods = [
   "Happy",
@@ -612,6 +613,10 @@ export default function App() {
               <button className="ghost-button" type="button" onClick={() => setAboutOpen(false)}>
                 Close
               </button>
+            </div>
+
+            <div className="about-hero">
+              <img className="about-image" src={journalImage} alt="Journal spread inspiration" />
             </div>
 
             <div className="about-section">

@@ -427,6 +427,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  max-height: min(82vh, 860px);
+  overflow-y: auto;
 }
 
 .about-header {
@@ -434,6 +436,18 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.about-hero {
+  display: flex;
+  justify-content: center;
+}
+
+.about-image {
+  width: min(100%, 520px);
+  border-radius: 18px;
+  border: 1px solid rgba(47, 42, 37, 0.15);
+  box-shadow: 0 18px 40px rgba(31, 26, 18, 0.15);
 }
 
 .about-title {

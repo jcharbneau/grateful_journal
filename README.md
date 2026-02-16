@@ -2,7 +2,7 @@
 
 Local-first gratitude journaling app inspired by a two-page book spread. Runs on macOS and Windows 11 using Electron.
 
-![Book spread inspiration](assets/journal-spread.jpg)
+![Book spread inspiration](src/assets/journal-spread.jpg)
 
 ## Product Idea
 
