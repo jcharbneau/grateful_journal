@@ -41,6 +41,7 @@ Right page (Evening Reflection):
 - Entry search and mood filter in the browse drawer.
 - First-run privacy notice with data location.
 - Safe-mode recovery if the database becomes corrupt.
+- Time-aware focus highlight (evening section after 6pm) and bounded text cues.
 
 ## Data Storage (Local Only)
 

@@ -50,7 +50,7 @@ const timeZoneOptions = (() => {
   return [systemTimeZone, "UTC"];
 })();
 
-const Prompt = ({ title, rows = 3, value, onChange }) => (
+const Prompt = ({ title, rows = 3, value, onChange, maxChars }) => (
   <div className="prompt-block">
     <div className="prompt-title">{title}</div>
     <textarea
@@ -59,7 +59,13 @@ const Prompt = ({ title, rows = 3, value, onChange }) => (
       spellCheck="false"
       value={value}
       onChange={onChange}
+      maxLength={maxChars}
     />
+    {typeof maxChars === "number" && (
+      <div className="entry-count">
+        {String((value || "").length).padStart(3, "0")}/{maxChars}
+      </div>
+    )}
   </div>
 );
 
@@ -87,6 +93,8 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [moodFilter, setMoodFilter] = useState("");
   const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const [focusSection, setFocusSection] = useState("");
+  const eveningRef = useRef(null);
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -132,6 +140,18 @@ export default function App() {
         setOnboardingOpen(true);
       }
     });
+  }, []);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour >= 18) {
+      setFocusSection("evening");
+      setTimeout(() => {
+        eveningRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 350);
+    } else {
+      setFocusSection("morning");
+    }
   }, []);
 
   useEffect(() => {
@@ -467,48 +487,60 @@ export default function App() {
       <div className="spread-frame">
         <button className="page-nav left" type="button" aria-label="Previous day" onClick={() => shiftDate(-1)} />
         <div className={`spread ${flipDirection ? `flip-${flipDirection}` : ""}`}>
-        <section className="panel morning">
+        <section className={`panel morning ${focusSection === "morning" ? "focus" : ""}`}>
           <div className="panel-title">Morning Meditation</div>
-          <Prompt title="Today's Focus" rows={3} value={entry.focus} onChange={updateField("focus")} />
+          <Prompt
+            title="Today's Focus"
+            rows={3}
+            value={entry.focus}
+            onChange={updateField("focus")}
+            maxChars={280}
+          />
           <Prompt
             title="An Affirmation for Today"
             rows={4}
             value={entry.affirmation}
             onChange={updateField("affirmation")}
+            maxChars={360}
           />
           <Prompt
             title="What I'm Grateful For"
             rows={6}
             value={entry.grateful}
             onChange={updateField("grateful")}
+            maxChars={520}
           />
           <Prompt
             title="What I'm Excited About Today"
             rows={3}
             value={entry.excited}
             onChange={updateField("excited")}
+            maxChars={280}
           />
           <Prompt
             title="How I'll Make Space for Gratitude"
             rows={3}
             value={entry.space}
             onChange={updateField("space")}
+            maxChars={280}
           />
         </section>
 
-        <section className="panel evening">
+        <section ref={eveningRef} className={`panel evening ${focusSection === "evening" ? "focus" : ""}`}>
           <div className="panel-title">Evening Reflection</div>
           <Prompt
             title="Good Things That Happened Today"
             rows={4}
             value={entry.good_things}
             onChange={updateField("good_things")}
+            maxChars={420}
           />
           <Prompt
             title="Things I Did to Make a Positive Difference Today"
             rows={4}
             value={entry.positive_difference}
             onChange={updateField("positive_difference")}
+            maxChars={420}
           />
 
           <div className="prompt-block">
@@ -535,7 +567,11 @@ export default function App() {
               spellCheck="false"
               value={entry.notes}
               onChange={updateField("notes")}
+              maxLength={600}
             />
+            <div className="entry-count">
+              {String((entry.notes || "").length).padStart(3, "0")}/600
+            </div>
           </div>
 
           <Prompt
@@ -543,6 +579,7 @@ export default function App() {
             rows={3}
             value={entry.sleep_thought}
             onChange={updateField("sleep_thought")}
+            maxChars={280}
           />
         </section>
       </div>
