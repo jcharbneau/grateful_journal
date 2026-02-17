@@ -18,10 +18,43 @@ const migrateLegacyDb = () => {
   fs.renameSync(legacyPath, dbPath);
 };
 
+const dbStatus = {
+  recovered: false,
+  recoveryPath: null,
+  error: null
+};
+
+const ensureSettingsColumns = (db) => {
+  const existing = db.prepare("PRAGMA table_info(settings)").all().map((row) => row.name);
+  const addColumn = (name, type) => {
+    if (!existing.includes(name)) {
+      db.exec(`ALTER TABLE settings ADD COLUMN ${name} ${type}`);
+    }
+  };
+
+  addColumn("reminder_enabled", "INTEGER");
+  addColumn("reminder_time", "TEXT");
+  addColumn("first_run_complete", "INTEGER");
+};
+
 const openDb = () => {
   ensureDataDir();
   migrateLegacyDb();
-  const db = new Database(dbPath);
+  let db;
+  try {
+    db = new Database(dbPath);
+  } catch (error) {
+    dbStatus.error = error.message;
+    if (fs.existsSync(dbPath)) {
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const recoveryPath = path.join(dataDir, `journal.sqlite.corrupt-${stamp}`);
+      fs.renameSync(dbPath, recoveryPath);
+      dbStatus.recovered = true;
+      dbStatus.recoveryPath = recoveryPath;
+    }
+    db = new Database(dbPath);
+  }
+
   db.pragma("journal_mode = WAL");
   db.exec(`
     CREATE TABLE IF NOT EXISTS entries (
@@ -47,10 +80,12 @@ const openDb = () => {
       default_date_view TEXT,
       reminder_enabled INTEGER,
       reminder_time TEXT,
+      first_run_complete INTEGER,
       last_opened_date TEXT,
       updated_at TEXT
     );
   `);
+  ensureSettingsColumns(db);
   return db;
 };
 
@@ -167,13 +202,14 @@ const getSettings = () => {
     default_date_view: "today",
     reminder_enabled: 0,
     reminder_time: "20:30",
+    first_run_complete: 0,
     last_opened_date: null
   };
 
   if (!row) {
     const now = new Date().toISOString();
     db.prepare(
-      "INSERT INTO settings (id, name, timezone, default_date_view, last_opened_date, updated_at) VALUES (1, @name, @timezone, @default_date_view, @last_opened_date, @updated_at)"
+      "INSERT INTO settings (id, name, timezone, default_date_view, reminder_enabled, reminder_time, first_run_complete, last_opened_date, updated_at) VALUES (1, @name, @timezone, @default_date_view, @reminder_enabled, @reminder_time, @first_run_complete, @last_opened_date, @updated_at)"
     ).run({
       ...defaults,
       updated_at: now
@@ -187,6 +223,7 @@ const getSettings = () => {
     default_date_view: row.default_date_view || "today",
     reminder_enabled: row.reminder_enabled ?? defaults.reminder_enabled,
     reminder_time: row.reminder_time || defaults.reminder_time,
+    first_run_complete: row.first_run_complete ?? defaults.first_run_complete,
     last_opened_date: row.last_opened_date || null
   };
 };
@@ -201,12 +238,15 @@ const updateSettings = (settings) => {
 
   db.prepare(
     `
-      INSERT INTO settings (id, name, timezone, default_date_view, last_opened_date, updated_at)
-      VALUES (1, @name, @timezone, @default_date_view, @last_opened_date, @updated_at)
+      INSERT INTO settings (id, name, timezone, default_date_view, reminder_enabled, reminder_time, first_run_complete, last_opened_date, updated_at)
+      VALUES (1, @name, @timezone, @default_date_view, @reminder_enabled, @reminder_time, @first_run_complete, @last_opened_date, @updated_at)
       ON CONFLICT(id) DO UPDATE SET
         name = excluded.name,
         timezone = excluded.timezone,
         default_date_view = excluded.default_date_view,
+        reminder_enabled = excluded.reminder_enabled,
+        reminder_time = excluded.reminder_time,
+        first_run_complete = excluded.first_run_complete,
         last_opened_date = excluded.last_opened_date,
         updated_at = excluded.updated_at
     `
@@ -245,5 +285,6 @@ module.exports = {
   },
   getSettings,
   updateSettings,
-  updateLastOpenedDate
+  updateLastOpenedDate,
+  getDbStatus: () => ({ ...dbStatus })
 };

@@ -86,6 +86,7 @@ export default function App() {
   const [settingsStatus, setSettingsStatus] = useState("Idle");
   const [searchQuery, setSearchQuery] = useState("");
   const [moodFilter, setMoodFilter] = useState("");
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -126,6 +127,9 @@ export default function App() {
       if (data.default_date_view === "last_opened" && data.last_opened_date) {
         dateRef.current = data.last_opened_date;
         setDate(data.last_opened_date);
+      }
+      if (!data.first_run_complete) {
+        setOnboardingOpen(true);
       }
     });
   }, []);
@@ -898,6 +902,49 @@ export default function App() {
                   : settingsStatus === "Saved"
                   ? "Saved"
                   : "Save Settings"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {onboardingOpen && settings && (
+        <div className="about-overlay" onClick={() => setOnboardingOpen(false)}>
+          <div className="settings-panel" onClick={(event) => event.stopPropagation()}>
+            <div className="about-header">
+              <div>
+                <div className="about-title">Welcome</div>
+                <div className="about-subtitle">Your journal stays local</div>
+              </div>
+            </div>
+
+            <div className="about-section">
+              <div className="about-section-title">Privacy First</div>
+              <p>Your entries never leave this computer. Everything is stored locally in a private folder.</p>
+            </div>
+
+            <div className="data-location">
+              <div className="data-label">Data Location</div>
+              <div className="data-path">{dataDir || ""}</div>
+              <button className="ghost-button" type="button" onClick={handleOpenDataDir}>
+                Open Folder
+              </button>
+            </div>
+
+            <div className="settings-actions">
+              <button
+                className="save-button"
+                type="button"
+                onClick={async () => {
+                  const saved = await window.journal.updateSettings({
+                    ...settings,
+                    first_run_complete: 1
+                  });
+                  setSettings(saved);
+                  setOnboardingOpen(false);
+                }}
+              >
+                Got it
               </button>
             </div>
           </div>

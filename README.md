@@ -39,6 +39,8 @@ Right page (Evening Reflection):
 - Refined paper-like theme with warmer tones and subtle texture.
 - Minimal daily summary (word count, moods, last saved).
 - Entry search and mood filter in the browse drawer.
+- First-run privacy notice with data location.
+- Safe-mode recovery if the database becomes corrupt.
 
 ## Data Storage (Local Only)
 

@@ -38,6 +38,22 @@ app.whenReady().then(() => {
     throw error;
   }
 
+  const status = db.getDbStatus();
+  if (status.recovered && status.recoveryPath) {
+    dialog.showMessageBox({
+      type: "warning",
+      title: "Journal Recovery",
+      message: "Your journal database needed recovery.",
+      detail: `A backup was saved here:\n${status.recoveryPath}\n\nA fresh database was created so you can keep working.`,
+      buttons: ["Open Data Folder", "OK"],
+      defaultId: 1
+    }).then((result) => {
+      if (result.response === 0) {
+        shell.openPath(db.getDataDir());
+      }
+    });
+  }
+
   ipcMain.handle("journal:get-entry", (_event, date) => {
     return db.getEntry(date);
   });
