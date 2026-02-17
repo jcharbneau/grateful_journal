@@ -258,6 +258,19 @@ app.whenReady().then(() => {
               border: 1px solid rgba(47, 42, 37, 0.2);
               border-radius: 18px;
               padding: 18px 20px;
+              position: relative;
+            }
+            .panel::after {
+              content: "";
+              position: absolute;
+              top: 12px;
+              bottom: 12px;
+              width: 1px;
+              right: -12px;
+              background: rgba(47, 42, 37, 0.15);
+            }
+            .panel:last-child::after {
+              display: none;
             }
             .panel-title {
               letter-spacing: 0.3em;
@@ -281,6 +294,8 @@ app.whenReady().then(() => {
               margin-bottom: 12px;
               white-space: pre-wrap;
               min-height: 18px;
+              background-image: linear-gradient(transparent 1.2rem, rgba(47, 42, 37, 0.12) 1.2rem);
+              background-size: 100% 1.4rem;
             }
             .moods {
               display: grid;
@@ -360,7 +375,10 @@ app.whenReady().then(() => {
     });
 
     await pdfWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-    const pdfData = await pdfWindow.webContents.printToPDF({ printBackground: true });
+    const pdfData = await pdfWindow.webContents.printToPDF({
+      printBackground: true,
+      landscape: true
+    });
     fs.writeFileSync(filePath, pdfData);
     pdfWindow.close();
     return { canceled: false, filePath };
