@@ -18,5 +18,6 @@ contextBridge.exposeInMainWorld("journal", {
   openDataDir: () => ipcRenderer.invoke("journal:open-data-dir"),
   getSettings: () => ipcRenderer.invoke("journal:get-settings"),
   updateSettings: (settings) => ipcRenderer.invoke("journal:update-settings", settings),
-  updateLastOpened: (date) => ipcRenderer.invoke("journal:update-last-opened", date)
+  updateLastOpened: (date) => ipcRenderer.invoke("journal:update-last-opened", date),
+  trayNudge: () => ipcRenderer.invoke("journal:tray-nudge")
 });

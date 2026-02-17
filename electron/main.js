@@ -1,6 +1,14 @@
-const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain, shell, Tray, Menu, nativeImage } = require("electron");
 const path = require("path");
 const fs = require("fs");
+
+let mainWindow;
+let tray;
+let trayResetTimer;
+
+const trayIcon = nativeImage.createFromDataURL(
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMyA0QzMgMy40NDc3MiAzLjQ0NzcyIDMgNCAzSDEyQzEyLjU1MjMgMyAxMyAzLjQ0NzcyIDEzIDRWMTJDMTMgMTIuNTUyMyAxMi41NTIzIDEzIDEyIDEzSDRDMzQzNzcyIDEzIDMgMTIuNTUyMyAzIDEyVjRaTTUgNkgxMVY3SDVWNjpNNSA4SDExVjloLTZWOE01IDExSDEwVjEySDVWMTEiIGZpbGw9IiMyRjJBMjUiLz48L3N2Zz4="
+);
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -22,6 +30,38 @@ const createWindow = () => {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools({ mode: "detach" });
   }
+
+  mainWindow = win;
+  return win;
+};
+
+const ensureTray = () => {
+  if (tray) return tray;
+  tray = new Tray(trayIcon);
+  tray.setToolTip("Grateful Journal");
+  const menu = Menu.buildFromTemplate([
+    {
+      label: "Open Grateful Journal",
+      click: () => {
+        if (mainWindow) {
+          mainWindow.show();
+          mainWindow.focus();
+        } else {
+          createWindow();
+        }
+      }
+    },
+    { type: "separator" },
+    { label: "Quit", click: () => app.quit() }
+  ]);
+  tray.setContextMenu(menu);
+  tray.on("click", () => {
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+  return tray;
 };
 
 app.whenReady().then(() => {
@@ -170,6 +210,16 @@ app.whenReady().then(() => {
 
   ipcMain.handle("journal:update-last-opened", (_event, date) => {
     return db.updateLastOpenedDate(date);
+  });
+
+  ipcMain.handle("journal:tray-nudge", () => {
+    ensureTray();
+    if (trayResetTimer) clearTimeout(trayResetTimer);
+    tray.setToolTip("Grateful Journal · Take a moment to journal");
+    trayResetTimer = setTimeout(() => {
+      tray.setToolTip("Grateful Journal");
+    }, 300000);
+    return { ok: true };
   });
 
   const pdfMoods = [

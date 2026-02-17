@@ -172,6 +172,7 @@ export default function App() {
           new Notification("Grateful Journal", {
             body: "Take a moment for your journal today."
           });
+          window.journal.trayNudge();
         }
         scheduleNext();
       }, delay);

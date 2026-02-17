@@ -44,6 +44,7 @@ Right page (Evening Reflection):
 - Time-aware focus highlight (evening section after 6pm) and bounded text cues.
 - Warmer micro-copy for saved status + guided empty state.
 - Two-column PDF export that mirrors the paper spread.
+- Calm reminder tray nudge (tooltip) when a reminder triggers.
 
 ## Data Storage (Local Only)
 
