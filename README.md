@@ -42,6 +42,7 @@ Right page (Evening Reflection):
 - First-run privacy notice with data location.
 - Safe-mode recovery if the database becomes corrupt.
 - Time-aware focus highlight (evening section after 6pm) and bounded text cues.
+- Warmer micro-copy for saved status + guided empty state.
 
 ## Data Storage (Local Only)
 

@@ -212,12 +212,12 @@ export default function App() {
       const saved = await window.journal.upsertEntry(entry);
       setEntry(saved);
       setDirty(false);
-      setStatus("Saved");
+      setStatus("Safe");
       if (drawerOpen) {
         window.journal.listEntries(60).then((rows) => setEntryList(rows));
         window.journal.listEntryDates(month).then((dates) => setMonthDates(dates));
       }
-      setTimeout(() => setStatus("Idle"), 1200);
+      setTimeout(() => setStatus("Idle"), 1400);
     } catch (error) {
       setStatus("Error");
     }
@@ -434,8 +434,8 @@ export default function App() {
             <button className="save-button" type="button" onClick={handleSave}>
               {status === "Saving"
                 ? "Saving..."
-                : status === "Saved"
-                ? "Saved"
+                : status === "Safe"
+                ? "Your thoughts are safe"
                 : status === "Error"
                 ? "Retry Save"
                 : "Save"}
@@ -719,7 +719,10 @@ export default function App() {
             </select>
           </div>
           {filteredEntries.length === 0 ? (
-            <div className="empty-state">No entries yet.</div>
+            <div className="empty-state">
+              <div>What is one small thing you are looking forward to today?</div>
+              <span>Start with today's focus or a quick gratitude note.</span>
+            </div>
           ) : (
             filteredEntries.map((row) => (
               <button

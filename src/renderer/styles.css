@@ -815,6 +815,16 @@ body {
   letter-spacing: 0.2em;
   text-align: center;
   padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.empty-state span {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(47, 42, 37, 0.45);
 }
 
 @media (max-width: 980px) {
