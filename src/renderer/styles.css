@@ -624,6 +624,28 @@ body {
   justify-content: flex-end;
 }
 
+.markdown-preview {
+  max-width: 760px;
+}
+
+.markdown-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.markdown-section ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.markdown-section p {
+  margin: 0;
+}
+
 .drawer-header {
   display: flex;
   align-items: center;

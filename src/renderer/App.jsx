@@ -69,6 +69,95 @@ const Prompt = ({ title, rows = 3, value, onChange, maxChars }) => (
   </div>
 );
 
+const promptSets = [
+  {
+    focus: "Today's Focus",
+    affirmation: "An Affirmation for Today",
+    grateful: "What I'm Grateful For",
+    excited: "What I'm Excited About Today",
+    space: "How I'll Make Space for Gratitude",
+    good_things: "Good Things That Happened Today",
+    positive_difference: "Things I Did to Make a Positive Difference Today",
+    moods: "How I Felt Today",
+    notes: "Notes",
+    sleep_thought: "A Positive Thought to Carry Me to Sleep"
+  },
+  {
+    focus: "Today's Intention",
+    affirmation: "A Kind Word for Myself",
+    grateful: "Gratitude Notes",
+    excited: "One Thing I'm Looking Forward To",
+    space: "How I'll Make Space for Calm",
+    good_things: "Highlights from Today",
+    positive_difference: "Ways I Showed Up Today",
+    moods: "My Mood Today",
+    notes: "Notes",
+    sleep_thought: "A Thought to End the Day"
+  },
+  {
+    focus: "Where I'll Place My Attention",
+    affirmation: "An Encouraging Reminder",
+    grateful: "Small Gratitudes",
+    excited: "Energy I'm Bringing Today",
+    space: "How I'll Create Space",
+    good_things: "Wins from Today",
+    positive_difference: "How I Made a Difference",
+    moods: "Feelings I Noticed",
+    notes: "Notes",
+    sleep_thought: "One Last Gentle Thought"
+  }
+];
+
+const escapeHtml = (value) => {
+  if (!value) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+const formatInline = (value) => {
+  return value
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>");
+};
+
+const renderMarkdown = (value) => {
+  const safe = escapeHtml(value || "");
+  const lines = safe.split("\n");
+  const parts = [];
+  let inList = false;
+
+  lines.forEach((line) => {
+    const listMatch = line.match(/^\s*-\s+(.*)$/);
+    if (listMatch) {
+      if (!inList) {
+        parts.push("<ul>");
+        inList = true;
+      }
+      parts.push(`<li>${formatInline(listMatch[1])}</li>`);
+      return;
+    }
+
+    if (inList) {
+      parts.push("</ul>");
+      inList = false;
+    }
+
+    if (line.trim() === "") {
+      parts.push("<br />");
+      return;
+    }
+
+    parts.push(`<p>${formatInline(line)}</p>`);
+  });
+
+  if (inList) parts.push("</ul>");
+  return parts.join("");
+};
+
 export default function App() {
   const today = useMemo(() => {
     const now = new Date();
@@ -95,6 +184,8 @@ export default function App() {
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   const [focusSection, setFocusSection] = useState("");
   const eveningRef = useRef(null);
+  const [promptSetIndex, setPromptSetIndex] = useState(0);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const saveTimeout = useRef(null);
   const suppressSave = useRef(true);
   const dateRef = useRef(today);
@@ -358,6 +449,8 @@ export default function App() {
 
   const entryDatesSet = useMemo(() => new Set(monthDates), [monthDates]);
 
+  const promptTitles = useMemo(() => promptSets[promptSetIndex], [promptSetIndex]);
+
   const filteredEntries = useMemo(() => {
     if (!searchQuery && !moodFilter) return entryList;
     const query = searchQuery.trim().toLowerCase();
@@ -457,6 +550,16 @@ export default function App() {
           <button className="ghost-button" type="button" onClick={() => setSettingsOpen(true)}>
             Settings
           </button>
+          <button
+            className="ghost-button"
+            type="button"
+            onClick={() => setPromptSetIndex(Math.floor(Math.random() * promptSets.length))}
+          >
+            Shuffle Prompts
+          </button>
+          <button className="ghost-button" type="button" onClick={() => setPreviewOpen(true)}>
+            Preview
+          </button>
         </div>
         <div className="export-group">
           <span className="export-label">Export</span>
@@ -491,35 +594,35 @@ export default function App() {
         <section className={`panel morning ${focusSection === "morning" ? "focus" : ""}`}>
           <div className="panel-title">Morning Meditation</div>
           <Prompt
-            title="Today's Focus"
+            title={promptTitles.focus}
             rows={3}
             value={entry.focus}
             onChange={updateField("focus")}
             maxChars={280}
           />
           <Prompt
-            title="An Affirmation for Today"
+            title={promptTitles.affirmation}
             rows={4}
             value={entry.affirmation}
             onChange={updateField("affirmation")}
             maxChars={360}
           />
           <Prompt
-            title="What I'm Grateful For"
+            title={promptTitles.grateful}
             rows={6}
             value={entry.grateful}
             onChange={updateField("grateful")}
             maxChars={520}
           />
           <Prompt
-            title="What I'm Excited About Today"
+            title={promptTitles.excited}
             rows={3}
             value={entry.excited}
             onChange={updateField("excited")}
             maxChars={280}
           />
           <Prompt
-            title="How I'll Make Space for Gratitude"
+            title={promptTitles.space}
             rows={3}
             value={entry.space}
             onChange={updateField("space")}
@@ -530,14 +633,14 @@ export default function App() {
         <section ref={eveningRef} className={`panel evening ${focusSection === "evening" ? "focus" : ""}`}>
           <div className="panel-title">Evening Reflection</div>
           <Prompt
-            title="Good Things That Happened Today"
+            title={promptTitles.good_things}
             rows={4}
             value={entry.good_things}
             onChange={updateField("good_things")}
             maxChars={420}
           />
           <Prompt
-            title="Things I Did to Make a Positive Difference Today"
+            title={promptTitles.positive_difference}
             rows={4}
             value={entry.positive_difference}
             onChange={updateField("positive_difference")}
@@ -545,7 +648,7 @@ export default function App() {
           />
 
           <div className="prompt-block">
-            <div className="prompt-title">How I Felt Today</div>
+            <div className="prompt-title">{promptTitles.moods}</div>
             <div className="mood-grid">
               {moods.map((mood) => (
                 <label key={mood} className="mood-item">
@@ -561,7 +664,7 @@ export default function App() {
           </div>
 
           <div className="prompt-block notes">
-            <div className="prompt-title">Notes</div>
+            <div className="prompt-title">{promptTitles.notes}</div>
             <textarea
               className="entry lines"
               rows={6}
@@ -576,7 +679,7 @@ export default function App() {
           </div>
 
           <Prompt
-            title="A Positive Thought to Carry Me to Sleep"
+            title={promptTitles.sleep_thought}
             rows={3}
             value={entry.sleep_thought}
             onChange={updateField("sleep_thought")}
@@ -944,6 +1047,59 @@ export default function App() {
                   ? "Saved"
                   : "Save Settings"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {previewOpen && entry && (
+        <div className="about-overlay" onClick={() => setPreviewOpen(false)}>
+          <div className="settings-panel markdown-preview" onClick={(event) => event.stopPropagation()}>
+            <div className="about-header">
+              <div>
+                <div className="about-title">Markdown Preview</div>
+                <div className="about-subtitle">Basic formatting only</div>
+              </div>
+              <button className="ghost-button" type="button" onClick={() => setPreviewOpen(false)}>
+                Close
+              </button>
+            </div>
+
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.focus}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.focus) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.affirmation}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.affirmation) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.grateful}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.grateful) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.excited}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.excited) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.space}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.space) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.good_things}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.good_things) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.positive_difference}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.positive_difference) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.notes}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.notes) }} />
+            </div>
+            <div className="markdown-section">
+              <div className="about-section-title">{promptTitles.sleep_thought}</div>
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.sleep_thought) }} />
             </div>
           </div>
         </div>
